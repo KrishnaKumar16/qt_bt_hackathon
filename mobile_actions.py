@@ -289,6 +289,13 @@ class MobileActions:
         else:
             raise Exception("'go_to_home_screen' method is not implemented for iOS")
 
+    def terminate_app(self, app_package_or_bundle_id):
+        Logs.log_info(f"Terminating app using - '{app_package_or_bundle_id}'")
+        self.__driver.terminate_app(app_package_or_bundle_id)
+
+    def terminate_chrome(self):
+        self.terminate_app('com.android.chrome')
+
     class __MobileActionDefinitions:
         __MobileLocator = dict(android=Tuple[str, str], ios=Tuple[str, str])
         __DEFAULT_WAIT_TIME = 10
@@ -583,6 +590,7 @@ class MobileActions:
                 return False
 
         def isElementPresent(self, wait=__DEFAULT_WAIT_TIME):
+            Logs.log_info(f"Checking if element is present using '{self.__locator}'")
             if wait == 0:
                 try:
                     self.__driver.find_element(self.__locator[0], self.__locator[1])

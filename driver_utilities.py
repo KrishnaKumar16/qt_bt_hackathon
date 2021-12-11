@@ -72,6 +72,10 @@ class DriverUtilities:
     @staticmethod
     def create_driver_for_ue1(udid: str = None):
         if udid is None:
+            udids = DriverUtilities.get_udid_of_devices()
+            if len(udids) == 0:
+                Logs.log_error("There are no devices connected to the PC")
+                raise Exception("There are no devices connected to the PC")
             caps = dict(platformName='Android', udid=str(DriverUtilities.get_udid_of_devices()[0]))
         else:
             caps = dict(platformName='Android', udid=udid)
