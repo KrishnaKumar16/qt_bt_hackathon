@@ -29,7 +29,6 @@ def case2():
 
 def case3():
     server = DriverUtilities.start_appium_server()
-
     ue1_driver = DriverUtilities.create_driver_for_ue1()
     ue1 = MobileActions(ue1_driver)
     ue1.launch_chrome()
@@ -39,7 +38,7 @@ def case3():
     ue1.element(chrome_url).click()
     #To download 1gb file
     ue1.element(chrome_url).click()
-    ue1.element(chrome_url).fill_text("http://testfiles.hostnetworks.com.au/1000MB.iso")
+    ue1.element(chrome_url).fill_text("http://testfiles.hostnetworks.com.au/100MB.iso")
     ue1.press_enter()
     download_button = androidLocator(xpath("//*[@text='Download']"))
     if ue1.element(download_button).isElementPresent(3):
@@ -48,11 +47,12 @@ def case3():
     ue1.element(more_options_icon).click()
     downloads_option = androidLocator(xpath("//*[@text='Downloads']"))
     ue1.element(downloads_option).click()
+
     def is_500mb_downloaded():
-        download_amount_status = androidLocator(xpath("(//*[contains(@text, '/ 1.00 GB')])[1]"))
-        d_status = str(ue1.element(download_amount_status).get_text())
+        download_amount_status = androidLocator(xpath("(//*[contains(@text, '/ 100.00 MB')])[1]"))
+        d_status = str(ue1.element(download_amount_status).get_text(wait=2))
         download_amount = int(d_status.split('MB')[0].strip().split('.')[0])
-        if download_amount >= 500:
+        if download_amount >= 50:
             return True
         else:
             return False

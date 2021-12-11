@@ -1,11 +1,13 @@
 from appium import webdriver
 import subprocess
-import os
+from appium.webdriver.appium_service import AppiumService
 from logs import Logs
-from time import sleep
+import os
+from datetime import datetime
 
 
 class DriverUtilities:
+    __appium_server: AppiumService = None
 
     @staticmethod
     def check_if_appium_is_present_in_path():
@@ -20,12 +22,9 @@ class DriverUtilities:
                     continue
 
     @staticmethod
-    def start_appium_server(port_number: int = 4726):
-        # Kill appium before start
-        try:
-            subprocess.Popen(f"TASKKILL /F /IM node.exe", stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-        except:
-            pass
+    def start_appium_server():
+        host = '127.0.0.1'
+        port_number = '4726'
         appium_path = DriverUtilities.check_if_appium_is_present_in_path()
         if '\\' in appium_path:
             appium_path = appium_path.replace('\\', '/')
@@ -36,20 +35,39 @@ class DriverUtilities:
             raise Exception("appium is not installed on the PC, "
                             "if it is installed please add it to "
                             "the environment variable or use 'npm install -g appium' to install it")
-        command = f'"{appium_path}/appium" -p {port_number} --relaxed-security'
-        # Logs.log_info(f"Starting appium server in port - {port_number}")
-        process = subprocess.Popen(command, cwd=appium_path,
-                                   shell=True,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
+        appium_log_file = str(os.path.join(DriverUtilities.get_root_directory(), 'appium_logs.txt')).replace('\\', '/')
+        DriverUtilities.delete_file_if_present(appium_log_file)
+        Logs.log_info(f"Starting appium server in port - {port_number}")
+        DriverUtilities.__appium_server = AppiumService()
+        DriverUtilities.__appium_server.start(
+            args=['--address', host, '-p', port_number, '--relaxed-security', f'--log="{appium_log_file}"'],
+            timeout_ms=10000,
+            main_script=f"{appium_path}/node_modules/appium/build/lib/main.js"
+        )
+        assert DriverUtilities.__appium_server.is_running is True
+        assert DriverUtilities.__appium_server.is_listening is True
 
-        out, err = process.communicate()
-        out = out.decode('utf-8').split('\n')
-        for line in out:
-            if 'http interface listener started on' in line:
-                Logs.log_info(out)
-        # sleep(8)
-        return process
+    @staticmethod
+    def kill_appium_server():
+        Logs.log_info("Stopping the appium server")
+        DriverUtilities.__appium_server.stop()
+
+    @staticmethod
+    def delete_file_if_present(file_path):
+        file_path = os.path.join(file_path)
+        if os.path.isfile(file_path):
+            Logs.log_info(f"Deleting file using the path - '{file_path}'")
+            os.remove(file_path)
+        else:
+            Logs.log_info(f"'{file_path}' is not present")
+
+    @staticmethod
+    def get_time_stamp():
+        return str(datetime.now().strftime("%Y_%m_%d_%H_%M_%S_%f"))
+
+    @staticmethod
+    def get_root_directory():
+        return str(os.path.dirname(os.path.abspath(__file__)))
 
     @staticmethod
     def create_driver_for_ue1(udid: str = None):

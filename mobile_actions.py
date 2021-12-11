@@ -364,7 +364,8 @@ class MobileActions:
 
         def elementNativeAction(self, wait=__DEFAULT_WAIT_TIME):
             try:
-                self.waitUntilElementIsPresent(wait)
+                if wait != 0:
+                    self.waitUntilElementIsPresent(wait)
             except:
                 pass
             element: MobileWebElement = self.__driver.find_element(self.__locator[0], self.__locator[1])
@@ -442,8 +443,8 @@ class MobileActions:
                 raise Exception('Element is not present even after scrolling down ' + str(count) + ' times')
             return self
 
-        def get_text(self):
-            return self.elementNativeAction().text
+        def get_text(self, wait):
+            return self.elementNativeAction(wait=wait).text
 
         def getListOfTextFromElements(self):
             listOfText = []
