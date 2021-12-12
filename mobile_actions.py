@@ -167,11 +167,13 @@ class MobileActions:
             Logs.log_info(f'Making a phone call to {phone_number}')
             self.execute_script('am', f"start -a android.intent.action.CALL -d tel:{phone_number}")
             self.sleepFor(2)
-            if self.element(androidLocator(xpath("//*[contains(@resource-id,'disconnect') and contains(@class, 'Button')] | //*[@id='com.samsung.android.incallui:id/disconnect_button'] | //*[@resource-id='com.samsung.android.incallui:id/disconnect_button']"))).isElementPresent(3) is False:
+            if self.element(androidLocator(
+                    xpath("//*[contains(@resource-id,'disconnect') and contains(@class, 'Button')] | //*[@id='com.samsung.android.incallui:id/disconnect_button'] | //*[@resource-id='com.samsung.android.incallui:id/disconnect_button']"))).isElementPresent(
+                    3) is False:
                 self.execute_script("input keyevent 5")
         else:
             raise Exception("'make_phone_call' method is not implemented for iOS")
-    
+
     def get_current_server_url(self):
         """To fetch current appium server url"""
         return self.__driver.command_executor._url
@@ -186,7 +188,6 @@ class MobileActions:
             return True
         except SessionNotCreatedException:
             return True
-
 
     def get_current_capabilities(self):
         """
@@ -212,7 +213,8 @@ class MobileActions:
 
     def fetch_mobile_number(self):
         """To fetch mobile number from the current device"""
-        result = str(self.execute_script("service call iphonesubinfo 15 | cut -c 52-66 | tr -d '.[:space:]' && echo")).strip()
+        result = str(
+            self.execute_script("service call iphonesubinfo 15 | cut -c 52-66 | tr -d '.[:space:]' && echo")).strip()
         length_of_result = len(result)
         Logs.log_info("Trying to fetch the mobile number")
         Logs.log_info(f"The fetched value is '{result}'")
@@ -233,7 +235,8 @@ class MobileActions:
 
     def disconnect_the_call(self):
         Logs.log_info(f'Disconnecting the phone call')
-        call_end_button = androidLocator(xpath("//*[contains(@resource-id,'disconnect') and contains(@class, 'Button')] | //*[@id='com.samsung.android.incallui:id/disconnect_button'] | //*[@resource-id='com.samsung.android.incallui:id/disconnect_button']"))
+        call_end_button = androidLocator(xpath(
+            "//*[contains(@resource-id,'disconnect') and contains(@class, 'Button')] | //*[@id='com.samsung.android.incallui:id/disconnect_button'] | //*[@resource-id='com.samsung.android.incallui:id/disconnect_button']"))
         self.element(call_end_button).click()
 
     def send_sms(self, phone_number, sms_content):
@@ -242,7 +245,8 @@ class MobileActions:
 
     def is_phone_ringing(self):
         """To check if phone is ringing"""
-        result = str(self.execute_script("dumpsys telephony.registry | grep mCallState")).split()[0].replace('mCallState=', '').strip()
+        result = str(self.execute_script("dumpsys telephony.registry | grep mCallState")).split()[0].replace(
+            'mCallState=', '').strip()
         if result == '1':
             return True
         else:
@@ -268,7 +272,7 @@ class MobileActions:
             return True
         else:
             return False
-        
+
     def launch_chrome(self):
         """
         To launch chrome browser
@@ -295,6 +299,19 @@ class MobileActions:
 
     def terminate_chrome(self):
         self.terminate_app('com.android.chrome')
+
+    def is_keyboard_displayed(self):
+        return self.__driver.is_keyboard_shown()
+
+    def hide_keyboard(self):
+        self.__driver.hide_keyboard()
+
+    def hide_keyboard_if_it_is_dispayed(self):
+        if self.is_keyboard_displayed() is True:
+            self.hide_keyboard()
+
+    def open_notification(self):
+        self.__driver.open_notifications()
 
     class __MobileActionDefinitions:
         __MobileLocator = dict(android=Tuple[str, str], ios=Tuple[str, str])
