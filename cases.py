@@ -14,7 +14,7 @@ def case1():
     ue1.makePhoneCall(ue2_phone_number)
     ue2.sleepFor(4)
     ue2.accept_phone_call()
-    ue2.sleepFor(42)
+    ue2.sleepFor(45)
     ue2.disconnect_the_call()
     DriverUtilities.kill_appium_server()
 
